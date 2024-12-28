@@ -49,7 +49,7 @@ def favicon():
 @app.route('/')
 def home():
 
-    from image_processing import Image_Editor
+    from backend.image_processing import Image_Editor
 
     if app_config['SERVE_REQUESTS'] == 'false':
         return jsonify({'status': 'error', 'message': 'This service is currently disabled.'}), 503
