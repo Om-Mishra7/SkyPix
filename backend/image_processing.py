@@ -1,145 +1,138 @@
-from rembg import remove
-from PIL import Image, ImageFilter, ImageOps, ImageDraw, ImageFont
+# Library imports
+
+import os
+import requests
 from io import BytesIO
 from hashlib import sha1
-import os
+from dotenv import load_dotenv
+from flask import Flask, request, jsonify, render_template, send_file, redirect
 
-class Image_Editor:
-    def __init__(self, image, image_url):
-        # Load the image once and prepare it in the optimal mode
-        self.image = Image.open(image)
+# Local imports 
 
-        try:
-            if self.image.mode in ("RGBA", "LA") or (self.image.mode == "P" and "transparency" in self.image.info):
-                self.image = self.image.convert("RGBA")  # Ensure image has RGBA support
-            else:
-                self.image = self.image.convert("RGB")  # Convert to RGB if no transparency
-        except Exception as error:
-            self.image = None
-            self.error = str(error)
+from image_processing import Image_Editor
 
-        # Add metadata to the image
-        self.image.info['author'] = 'SkyPix - sykpix.om-mishra.com'
-        self.image.info['original_image_url'] = image_url
 
-        # Cache the font for watermarking to avoid reloading it each time
-        self.font_cache = {}
+# Load environment variables
 
-    def _height(self, height):
-        """Resize the image by height, maintaining the width."""
-        if height is None:
-            return self
-        self.image = self.image.resize((self.image.width, int(height)), Image.Resampling.LANCZOS)
-        return self
+load_dotenv()
 
-    def _width(self, width):
-        """Resize the image by width, maintaining the height."""
-        if width is None:
-            return self
-        self.image = self.image.resize((int(width), self.image.height), Image.Resampling.LANCZOS)
-        return self
 
-    def _quality(self, quality):
-        """Apply quality compression to the image."""
-        if quality is None:
-            return self
+# App configuration
 
-        quality = min(max(int(quality), 0), 100)
+app = Flask(__name__)
 
-        # If the image is in RGBA or other format, convert it to RGB
-        if self.image.mode == "RGBA":
-            self.image = self.image.convert("RGB")
+app_config = {
+    'ENVIROMENT': os.environ.get('ENVIROMENT'),
+    'SERVE_REQUESTS': os.environ.get('SERVE_REQUESTS'),
+    'ALLOWED_ORIGINS': os.environ.get('ALLOWED_ORIGINS'),
+}
 
-        img_byte_arr = BytesIO()
-        self.image.save(img_byte_arr, format="JPEG", quality=quality)  # Apply JPEG compression
-        img_byte_arr.seek(0)
+allowed_image_modification_parameters = ['width', 'height', 'quality', 'format', 'blur', 'greyscale', 'flip', 'rotate', 'watermark', 'remove-bg']
 
-        # Reopen the image from the BytesIO object to update the image
-        self.image = Image.open(img_byte_arr)
+# After request middleware
 
-        return self
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', app_config['ALLOWED_ORIGINS'])
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+    response.headers.add('Access-Control-Allow-Methods', 'GET')
 
-    def _blur(self, radius):
-        """Apply a Gaussian blur to the image."""
-        if radius is None:
-            return self
-        self.image = self.image.filter(ImageFilter.GaussianBlur(radius))
-        return self
+    return response
 
-    def _greyscale(self):
-        """Convert the image to greyscale."""
-        self.image = ImageOps.grayscale(self.image)
-        return self
 
-    def _flip(self):
-        """Flip the image vertically."""
-        self.image = ImageOps.flip(self.image)
-        return self
 
-    def _rotate(self, angle):
-        """Rotate the image by the specified angle."""
-        if angle is None:
-            return self
-        self.image = self.image.rotate(angle, expand=True)
-        return self
+# Routes
 
-    def _watermark(self, text, font_size=12):
-        """Add a watermark to the image at the lower right with white color."""
-        if text is None:
-            return self
+@app.route('/docs')
+def docs():
+    return render_template('docs.html')
 
-        # Ensure the image has an alpha channel for transparency
-        self.image = self.image.convert("RGBA")
+@app.route('/favicon.ico')
+def favicon():
+    return redirect('https://cdn.om-mishra.com/favicon.ico', code=301)
 
-        # Cache the font to avoid reloading it each time
-        if font_size not in self.font_cache:
-            font_path = "backend/fonts/roboto.ttf"  # Adjust this path if needed
-            self.font_cache[font_size] = ImageFont.truetype(font_path, font_size)
+@app.route('/')
+def home():
 
-        font = self.font_cache[font_size]
+    if app_config['SERVE_REQUESTS'] == 'false':
+        return jsonify({'status': 'error', 'message': 'This service is currently disabled.'}), 503
+    
+    # Fetch image URL from request
+    image_url = request.args.get('image_url', 'https://cdn.om-mishra.com/logo.png')
 
-        # Create a watermark (transparent) image with the same size as the original image
-        watermark = Image.new("RGBA", self.image.size, (255, 255, 255, 0))
+    # Fetch the image from the URL
+    try:
+        image_request_response = requests.get(image_url, allow_redirects=True, timeout=5, headers={'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36'})
 
-        # Prepare to draw the watermark text
-        draw = ImageDraw.Draw(watermark)
+        print(image_request_response.status_code)
 
-        # Get the bounding box of the text to center it
-        bbox = draw.textbbox((0, 0), text, font=font)
-        text_width = bbox[2] - bbox[0]
-        text_height = bbox[3] - bbox[1]
+        if image_request_response.status_code != 200:
+            return jsonify({'status': 'error', 'message': 'The requested image could not be fetched, from upstream origin.'}), 400
+        
+        image = BytesIO(image_request_response.content)
 
-        # Position the watermark at the lower right corner with padding
-        padding = 10  # Adjust padding as necessary
-        text_x = watermark.width - text_width - padding
-        text_y = watermark.height - text_height - padding
+    except Exception as error:
+        return jsonify({'status': 'error', 'message': 'The requested image could not be fetched, from upstream origin due to ' + str(error)}), 400
 
-        # Draw the watermark text in white with transparency (128 alpha value)
-        draw.text((text_x, text_y), text, font=font, fill=(255, 255, 255, 128))
+    # Create Image_Editor object
+    image_editor = Image_Editor(image, image_url)
 
-        # Composite the watermark on top of the original image
-        self.image = Image.alpha_composite(self.image, watermark)
+    if image_editor.image is None:
+        return jsonify({'status': 'error', 'message': 'The requested image was not in a supported format.'}), 400
 
-        return self
+    # Apply image modifications based on request arguments
+    for parameter in request.args:
+        if parameter in allowed_image_modification_parameters:
+            try:
+                match parameter:
+                    case 'width':
+                        image_editor._width(int(request.args.get('width')))
+                    case 'height':
+                        image_editor._height(int(request.args.get('height')))
+                    case 'quality':
+                        image_editor._quality(int(request.args.get('quality')))
+                    case 'blur':
+                        image_editor._blur(int(request.args.get('blur')))
+                    case 'greyscale':
+                        image_editor._greyscale()
+                    case 'flip':
+                        image_editor._flip()
+                    case 'rotate':
+                        image_editor._rotate(int(request.args.get('rotate')))
+                    case 'remove-bg':
+                        image_editor._remove_bg()
+                    case 'watermark':
+                        image_editor._watermark(request.args.get('watermark'))
+                    case _:
+                        pass
 
-    def _remove_bg(self):
-        """Remove the background from the image using the remove.bg API."""
-        self.image = remove(self.image)
-        return self
+            except Exception as error:
+                return jsonify({'status': 'error', 'message': 'Error applying modification: ' + str(error)}), 400
 
-    def get_image_bytes(self, format="PNG"):
-        """Returns the image as a transparent PNG BytesIO object."""
-        # If the image is not in RGBA format, convert it once
-        if self.image.mode != 'RGBA':
-            self.image = self.image.convert('RGBA')
+    # Get the modified image as a BytesIO object
+    serve_image = image_editor.get_image_bytes()
 
-        # Create a BytesIO object to save the image in memory
-        img_byte_arr = BytesIO()
-        self.image.save(img_byte_arr, format=format)
-        img_byte_arr.seek(0)  # Reset the pointer to the beginning of the BytesIO object
-        return img_byte_arr
+    # Calculate the ETag for the image
+    etag = image_editor.get_etag(format="PNG")
 
-    def get_etag(self, format="PNG"):
-        """Returns the ETag for the image."""
-        img_byte_arr = self.get_image_bytes(format)
-        return sha1(img_byte_arr.getvalue()).hexdigest()
+    if request.headers.get('If-None-Match') == etag:
+        return '', 304
+
+    # Serve the image
+    return send_file(serve_image, mimetype='image/png', as_attachment=False, etag=etag, max_age=18000)
+
+
+# Error handlers
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return jsonify({'status': 'error', 'message': 'The requested resource was not found.'}), 404
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    return jsonify({'status': 'error', 'message': 'An internal server error occurred.'}), 500
+
+# Run the app
+
+if __name__ == '__main__' and app_config['ENVIROMENT'] == 'development':
+    app.run(debug=True)

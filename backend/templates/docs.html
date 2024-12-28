@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyPix API Documentation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #1c1c1c;
+      padding: 10px 20px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #f1f1f1;
+    }
+
+    .content {
+      padding: 20px;
+    }
+
+    h2 {
+      color: #bb86fc;
+    }
+
+    p {
+      font-size: 16px;
+    }
+
+    code {
+      background-color: #333333;
+      padding: 5px;
+      border-radius: 4px;
+      font-family: monospace;
+      color: #f1f1f1;
+    }
+
+    .example {
+      background-color: #1c1c1c;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #bb86fc;
+    }
+
+    .route {
+      color: #bb86fc;
+    }
+
+    .parameter {
+      color: #03dac6;
+    }
+
+    footer {
+      background-color: #1c1c1c;
+      color: #888888;
+      text-align: center;
+      padding: 10px;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>Image Processing API Documentation</h1>
+  </header>
+
+  <div class="content">
+    <h2>Overview</h2>
+    <p>This API allows you to modify images on the fly by applying various transformations such as resizing, quality
+      adjustment, rotation, and more.</p>
+
+    <h2>API Endpoints</h2>
+    <p><strong>GET /</strong></p>
+    <p class="route">Base URL: <code>/</code></p>
+    <p>This is the main endpoint where you can fetch and modify an image.</p>
+
+    <h3>Query Parameters</h3>
+    <ul>
+      <li><span class="parameter">image_url</span> (optional): URL of the image to process. Default is a placeholder
+        image.</li>
+      <li><span class="parameter">width</span> (optional): Set the width of the image.</li>
+      <li><span class="parameter">height</span> (optional): Set the height of the image.</li>
+      <li><span class="parameter">quality</span> (optional): Adjust the quality of the image (1-100).</li>
+      <li><span class="parameter">blur</span> (optional): Apply a blur effect with the given intensity.</li>
+      <li><span class="parameter">greyscale</span> (optional): Convert the image to greyscale.</li>
+      <li><span class="parameter">flip</span> (optional): Flip the image horizontally.</li>
+      <li><span class="parameter">rotate</span> (optional): Rotate the image by the given angle (in degrees).</li>
+      <li><span class="parameter">remove-bg</span> (optional): Remove the background from the image.</li>
+      <li><span class="parameter">watermark</span> (optional): Add a watermark to the image with the given text.</li>
+    </ul>
+
+    <h2>Example Requests</h2>
+    <div class="example">
+      <p>Fetch and resize an image to 500px width:</p>
+      <code>/image_url=https://example.com/image.png&width=500</code>
+    </div>
+
+    <div class="example">
+      <p>Apply a blur effect and convert to greyscale:</p>
+      <code>/image_url=https://example.com/image.png&blur=5&greyscale=true</code>
+    </div>
+
+    <h2>Response Format</h2>
+    <p>The API will return a modified image in the format of your choice. The image will be served directly in the
+      response body.</p>
+
+    <h2>Error Handling</h2>
+    <p>If an error occurs, the API will return a JSON response with a status code and error message. Example:</p>
+    <div class="example">
+      <code>{ "status": "error", "message": "Invalid image URL" }</code>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>© 2024 SkyPix</p>
+  </footer>
+
+</body>
+
+</html>

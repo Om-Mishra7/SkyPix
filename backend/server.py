@@ -122,6 +122,16 @@ def home():
     return send_file(serve_image, mimetype='image/png', as_attachment=False, etag=etag, max_age=18000)
 
 
+# Error handlers
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return jsonify({'status': 'error', 'message': 'The requested resource was not found.'}), 404
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    return jsonify({'status': 'error', 'message': 'An internal server error occurred.'}), 500
+
 # Run the app
 
 if __name__ == '__main__' and app_config['ENVIROMENT'] == 'development':
