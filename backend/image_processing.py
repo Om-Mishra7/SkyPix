@@ -40,7 +40,7 @@ class Image_Editor:
     def _quality(self, quality):
         """Apply quality compression to the image."""
         if quality is None:
-            quality = 50
+            return self
 
         quality = min(max(int(quality), 0), 100)
 
@@ -120,8 +120,7 @@ class Image_Editor:
 
         return self
 
-    def get_image_bytes(self, format="PNG"):
-        """Returns the image as a transparent PNG BytesIO object."""
+    def get_image_bytes(self, format="WEBP"):
         # If the image is not in RGBA format, convert it once
         if self.image.mode != 'RGBA':
             self.image = self.image.convert('RGBA')
@@ -132,7 +131,7 @@ class Image_Editor:
         img_byte_arr.seek(0)  # Reset the pointer to the beginning of the BytesIO object
         return img_byte_arr
 
-    def get_etag(self, format="PNG"):
+    def get_etag(self, format="WEBP"):
         """Returns the ETag for the image."""
         img_byte_arr = self.get_image_bytes(format)
         return sha1(img_byte_arr.getvalue()).hexdigest()

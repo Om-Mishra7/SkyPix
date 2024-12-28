@@ -3,13 +3,45 @@
 import os
 import requests
 from io import BytesIO
-from hashlib import sha1
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify, render_template, send_file, redirect
+from hashlib import sha256
+import glob
 
 # Load environment variables
 
 load_dotenv()
+
+
+# Make sure the cache directory exists
+
+if not os.path.exists('cache'):
+    os.makedirs('cache')
+    
+
+# Helper functions
+
+def save_to_cache(image_url, image_request_response, image_format, max_files=100):
+
+    # Generate a hash for the image URL to create a unique filename
+    cache_file_path = f'cache/{sha256(image_url.encode()).hexdigest()}.{image_format}'
+
+    # Save the image content to the cache file
+    with open(cache_file_path, 'wb') as cache_image:
+        cache_image.write(image_request_response.content)
+
+    # Check if the number of cached files exceeds the max_files limit
+    cached_files = glob.glob('cache/*')  # Get all files in the cache directory
+    if len(cached_files) > max_files:
+        # Sort files by their modification time (oldest first)
+        cached_files.sort(key=os.path.getmtime)
+        
+        # Remove the oldest files until the count is within the limit
+        for file_to_remove in cached_files[:-max_files]:
+            try:
+                os.remove(file_to_remove)
+            except OSError as e:
+                print(f"Error removing file {file_to_remove}: {e}")
 
 
 # App configuration
@@ -32,6 +64,9 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
     response.headers.add('Access-Control-Allow-Methods', 'GET')
 
+    response.headers.add('X-Cache-Status', 'hit' if is_cached else 'miss')
+    response.headers.add('Server', 'SkyPix')
+
     return response
 
 
@@ -48,28 +83,59 @@ def favicon():
 
 @app.route('/')
 def home():
-
+    global image
+    global is_cached
     from image_processing import Image_Editor
 
     if app_config['SERVE_REQUESTS'] == 'false':
         return jsonify({'status': 'error', 'message': 'This service is currently disabled.'}), 503
-    
+
     # Fetch image URL from request
     image_url = request.args.get('image_url', 'https://cdn.om-mishra.com/logo.png')
 
-    # Fetch the image from the URL
-    try:
-        image_request_response = requests.get(image_url, allow_redirects=True, timeout=5, headers={'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36'})
+    # Check if the image URL is valid
+    if not image_url.startswith('http') and not image_url.startswith('https'):
+        return jsonify({'status': 'error', 'message': 'The requested image URL is invalid.'}), 400
 
-        print(image_request_response.status_code)
+    # Initialize image as None
+    image = None
 
-        if image_request_response.status_code != 200:
-            return jsonify({'status': 'error', 'message': 'The requested image could not be fetched, from upstream origin.'}), 400
-        
-        image = BytesIO(image_request_response.content)
+    # Check if the image is stored in the cache
+    for file in os.listdir('cache'):
+        if sha256(image_url.encode()).hexdigest() in file:
+            with open(f'cache/{file}', 'rb') as cached_image:
+                image = BytesIO(cached_image.read())
+            is_cached = True
+            break
 
-    except Exception as error:
-        return jsonify({'status': 'error', 'message': 'The requested image could not be fetched, from upstream origin due to ' + str(error)}), 400
+    if image is None:  # If the image is not found in the cache, fetch it
+        print('Image not found in cache, fetching from origin...')
+        is_cached = False
+        try:
+            image_request_response = requests.get(
+                image_url,
+                allow_redirects=True,
+                timeout=5,
+                headers={
+                    'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36'
+                },
+            )
+
+            if image_request_response.status_code != 200:
+                return jsonify({'status': 'error', 'message': 'The requested image could not be fetched, from upstream origin.'}), 400
+
+            image = BytesIO(image_request_response.content)
+            
+            # Find the image format from the response headers
+            image_format = image_request_response.headers.get('content-type').split('/')[-1]
+            
+            if image_format not in ['jpeg', 'jpg', 'png', 'webp']:
+                return jsonify({'status': 'error', 'message': 'The requested image is not in a supported format.'}), 400
+
+            save_to_cache(image_url, image_request_response, image_format=image_format)
+
+        except Exception as error:
+            return jsonify({'status': 'error', 'message': 'The requested image could not be fetched, from upstream origin due to ' + str(error)}), 400
 
     # Create Image_Editor object
     image_editor = Image_Editor(image, image_url)
@@ -108,13 +174,13 @@ def home():
     serve_image = image_editor.get_image_bytes()
 
     # Calculate the ETag for the image
-    etag = image_editor.get_etag(format="PNG")
+    etag = image_editor.get_etag()
 
     if request.headers.get('If-None-Match') == etag:
         return '', 304
 
     # Serve the image
-    return send_file(serve_image, mimetype='image/png', as_attachment=False, etag=etag, max_age=18000)
+    return send_file(serve_image, mimetype='image/webp', as_attachment=False, etag=etag, max_age=18000)
 
 
 # Error handlers
