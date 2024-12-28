@@ -47,7 +47,7 @@ def after_request(response):
 def docs():
     return render_template('docs.html')
 
-@app.route('favicon.ico')
+@app.route('/favicon.ico')
 def favicon():
     return redirect('https://cdn.om-mishra.com/favicon.ico', code=301)
 
