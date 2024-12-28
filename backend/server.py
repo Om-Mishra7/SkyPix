@@ -64,7 +64,11 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
     response.headers.add('Access-Control-Allow-Methods', 'GET')
 
-    response.headers.add('X-Cache-Status', 'hit' if is_cached else 'miss')
+    try:
+        response.headers.add('X-Cache-Status', 'hit' if is_cached else 'miss')
+    except NameError:
+        pass
+    
     response.headers.add('Server', 'SkyPix')
 
     return response
