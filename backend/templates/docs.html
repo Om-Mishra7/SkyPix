@@ -4,24 +4,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SkyPix API Documentation</title>
+  <title>SkyPix Docs</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #121212;
-      color: #ffffff;
+      font-family: monospace;
+      background-color: #110e07;
+      color: #FFF;
       margin: 0;
       padding: 0;
     }
 
     header {
-      background-color: #1c1c1c;
       padding: 10px 20px;
-      text-align: center;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid #333333;
     }
 
-    h1 {
-      color: #f1f1f1;
+    header img {
+      height: 50px;
+      width: 50px;
+    }
+
+    navbar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 20px;
+    }
+
+    navbar a {
+      color: #ffdf90;
+      text-decoration: none;
     }
 
     .content {
@@ -29,11 +47,35 @@
     }
 
     h2 {
-      color: #bb86fc;
+      color: #ffdf90;
+      margin: 0;
+      margin-bottom: 5px;
+      margin-top: 50px;
+    }
+
+    h2:first-of-type {
+      margin-top: 0;
     }
 
     p {
-      font-size: 16px;
+      font-size: .9rem;
+      margin: 0;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      color: #ffdf90;
+      margin: 0;
+      margin-bottom: 5px;
+    }
+
+    ul {
+      list-style-type: circle;
+      padding-left: 30px;
+    }
+
+    ul li {
+      margin-bottom: 10px;
     }
 
     code {
@@ -42,31 +84,71 @@
       border-radius: 4px;
       font-family: monospace;
       color: #f1f1f1;
+      font-size: 0.8rem !important;
+      white-space: pre-wrap !important;
+      word-wrap: break-word;
     }
 
     .example {
       background-color: #1c1c1c;
-      padding: 10px;
+      padding: 20px 15px;
       border-radius: 4px;
-      border: 1px solid #bb86fc;
+      border: 1px solid #ffdf90;
+      margin-bottom: 20px;
+      margin-top: 20px;
+    }
+
+    .example code {
+      background-color: #333333;
+      padding: 5px;
+      border-radius: 4px;
+      font-family: monospace;
+      color: #f1f1f1;
+      font-size: 0.8rem !important;
     }
 
     .route {
-      color: #bb86fc;
+      color: #ffdf90;
+    }
+
+    .route code {
+      margin-left: 5px;
+      font-size: .8rem !important;
     }
 
     .parameter {
-      color: #03dac6;
+      color: #ffdf90;
     }
 
     footer {
-      background-color: #1c1c1c;
-      color: #888888;
-      text-align: center;
-      padding: 10px;
-      position: fixed;
-      width: 100%;
-      bottom: 0;
+      padding: 10px 20px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+      border-top: 1px solid #333333;
+    }
+
+    footer p {
+      margin: 0;
+    }
+
+    footer a {
+      color: #ffdf90;
+      text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+      code {
+        line-height: 2;
+      }
+
+      footer {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+      }
     }
   </style>
 </head>
@@ -74,18 +156,25 @@
 <body>
 
   <header>
-    <h1>Image Processing API Documentation</h1>
+    <img src="https://cdn.om-mishra.com/logo.png" alt="SkyPix Logo" width="50" height="50">
+    <navbar>
+      <a href="https://skypix.om-mishra.com/docs">Docs</a>
+      <a href="https://github.com/Om-Mishra7/SkyPix">GitHub</a>
+      <a href="mailto:hello@om-mishra.com">Contact</a>
+    </navbar>
   </header>
 
   <div class="content">
     <h2>Overview</h2>
-    <p>This API allows you to modify images on the fly by applying various transformations such as resizing, quality
-      adjustment, rotation, and more.</p>
+    <p>This service allows you to modify images in real-time by providing a URL. Simply pass the URL of the image you
+      want to process along with any desired modifications as query parameters to the API endpoint.</p>
 
     <h2>API Endpoints</h2>
-    <p><strong>GET /</strong></p>
-    <p class="route">Base URL: <code>/</code></p>
-    <p>This is the main endpoint where you can fetch and modify an image.</p>
+    <p>
+    <p>GET /</p>
+    <p class="route">Base URL: <code>https://skypix.om-mishra.com</code></p>
+    <p>This is the single endpoint for the API, all queries should be made to this URL with the appropriate query
+      parameters.</p>
 
     <h3>Query Parameters</h3>
     <ul>
@@ -98,19 +187,20 @@
       <li><span class="parameter">greyscale</span> (optional): Convert the image to greyscale.</li>
       <li><span class="parameter">flip</span> (optional): Flip the image horizontally.</li>
       <li><span class="parameter">rotate</span> (optional): Rotate the image by the given angle (in degrees).</li>
-      <li><span class="parameter">remove-bg</span> (optional): Remove the background from the image.</li>
-      <li><span class="parameter">watermark</span> (optional): Add a watermark to the image with the given text.</li>
+      <li><span class="parameter">watermark</span> (optional): Add a watermark to the image with the given text.
+      </li>
     </ul>
 
     <h2>Example Requests</h2>
     <div class="example">
-      <p>Fetch and resize an image to 500px width:</p>
-      <code>/image_url=https://example.com/image.png&width=500</code>
+      <p>Fetch an image from a remote upstream server and resize it to 500px wide (height will not be scaled to maintain
+        aspect ratio):</p>
+      <code>https://skypix.om-mishra.com?image_url=https://example.com/image.png&width=500</code>
     </div>
 
     <div class="example">
-      <p>Apply a blur effect and convert to greyscale:</p>
-      <code>/image_url=https://example.com/image.png&blur=5&greyscale=true</code>
+      <p>Fetch an image from a remote upstream server and apply a blur effect with an intensity of 5:</p>
+      <code>https://skypix.om-mishra.com/?image_url=https://example.com/image.png&blur=5&greyscale=true</code>
     </div>
 
     <h2>Response Format</h2>
@@ -123,10 +213,24 @@
       <code>{ "status": "error", "message": "Invalid image URL" }</code>
     </div>
 
+
+    <h2>Fair Use Policy</h2>
+    <p>This service is provided free of charge for personal and non-commercial use. Please feel free to use it for
+      your projects, and share it with others, but please be mindful of the following:</p>
+    <ul>
+      <li>Do not use this service to process large numbers of images in bulk.</li>
+      <li>Do not use this service to process images for commercial purposes.</li>
+      <li>Do not use this service to process images that are not your own or that you do not have permission to use.
+      </li>
+    </ul>
+
+
   </div>
 
   <footer>
-    <p>© 2024 SkyPix</p>
+    <p>© 2024 SkyPix
+    <p>
+    <p>All Rights Reserved | A service by <a href="https://om-mishra.com">Om Mishra</a></p>
   </footer>
 
 </body>
