@@ -1,8 +1,6 @@
-from rembg import remove
 from PIL import Image, ImageFilter, ImageOps, ImageDraw, ImageFont
 from io import BytesIO
 from hashlib import sha1
-import os
 
 class Image_Editor:
     def __init__(self, image, image_url):
@@ -93,7 +91,7 @@ class Image_Editor:
 
         # Cache the font to avoid reloading it each time
         if font_size not in self.font_cache:
-            font_path = "backend/fonts/roboto.ttf"  # Adjust this path if needed
+            font_path = "fonts/roboto.ttf"  # Adjust this path if needed
             self.font_cache[font_size] = ImageFont.truetype(font_path, font_size)
 
         font = self.font_cache[font_size]
@@ -120,11 +118,6 @@ class Image_Editor:
         # Composite the watermark on top of the original image
         self.image = Image.alpha_composite(self.image, watermark)
 
-        return self
-
-    def _remove_bg(self):
-        """Remove the background from the image using the remove.bg API."""
-        self.image = remove(self.image)
         return self
 
     def get_image_bytes(self, format="PNG"):

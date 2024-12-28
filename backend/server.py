@@ -96,8 +96,6 @@ def home():
                         image_editor._flip()
                     case 'rotate':
                         image_editor._rotate(int(request.args.get('rotate')))
-                    case 'remove-bg':
-                        image_editor._remove_bg()
                     case 'watermark':
                         image_editor._watermark(request.args.get('watermark'))
                     case _:

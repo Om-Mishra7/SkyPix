@@ -1,4 +1,3 @@
-rembg[cpu]
 flask
 requests
 gunicorn
