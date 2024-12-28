@@ -1,15 +1,5 @@
-FROM python:3.9-alpine
+FROM python:3.9-slim
 
-# Install build dependencies for scipy
-RUN apk update && \
-    apk add --no-cache \
-    openblas-dev \
-    cmake \
-    gcc \
-    gfortran \
-    libatlas-dev \
-    make \
-    musl-dev
 
 # Install Python dependencies
 COPY requirements.txt .
