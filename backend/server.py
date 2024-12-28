@@ -112,6 +112,9 @@ def home():
     # Calculate the ETag for the image
     etag = image_editor.get_etag(format="PNG")
 
+    if request.headers.get('If-None-Match') == etag:
+        return '', 304
+
     # Serve the image
     return send_file(serve_image, mimetype='image/png', as_attachment=False, etag=etag, max_age=18000)
 

@@ -10,4 +10,4 @@ COPY . .
 
 WORKDIR /app/backend
 
-CMD ["gunicorn", "--bind", "0.0.0.0:7001", "server:app"]
+CMD ["gunicorn", "--workers 2 --bind", "0.0.0.0:7001", "server:app"]
