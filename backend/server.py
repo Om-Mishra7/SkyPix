@@ -121,5 +121,5 @@ def home():
 
 # Run the app
 
-if __name__ == '__main__':
-    app.run(debug=True if app_config['ENVIROMENT'] == 'development' else False)
+if __name__ == '__main__' and app_config['ENVIROMENT'] == 'development':
+    app.run(debug=True)
