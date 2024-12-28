@@ -1,50 +1,82 @@
-# Skypix Image Processing API Documentation
+# SkyPix Documentation
 
-Welcome to the Skypix Image Processing API! This API allows you to modify images by applying various transformations such as resizing, quality adjustment, rotation, and more.
+### Overview
+SkyPix is a real-time image processing API that allows you to modify images by simply passing the URL of the image and the desired modifications as query parameters. It's perfect for resizing, applying effects, and enhancing images on the fly.
 
-## Documentation URL
-For full documentation, visit the [Skypix Image Processing API Docs](https://skypix.om-mishra.com/docs).
+---
 
-## Overview
-This API endpoint processes images based on a given URL and applies the requested modifications on the fly. You can resize, adjust quality, blur, rotate, and more!
+### Base URL
+**https://skypix.om-mishra.com**
 
-## API Endpoints
+This is the single endpoint for the API. All requests should be made to this URL with the appropriate query parameters.
 
-### `GET /`
+---
 
-The base URL where the image processing happens. The API fetches an image from the given `image_url` and applies transformations based on the provided query parameters.
+### Query Parameters
+- **`image_url`** (optional): URL of the image to process. Default is a placeholder image.
+- **`width`** (optional): Set the width of the image (in pixels).
+- **`height`** (optional): Set the height of the image (in pixels).
+- **`quality`** (optional): Adjust the quality of the image (1-100).
+- **`blur`** (optional): Apply a blur effect with the given intensity.
+- **`greyscale`** (optional): Convert the image to greyscale.
+- **`flip`** (optional): Flip the image horizontally.
+- **`rotate`** (optional): Rotate the image by the given angle (in degrees).
+- **`watermark`** (optional): Add a watermark to the image with the specified text.
 
-#### Query Parameters:
-- `image_url` (optional): The URL of the image to process. Default is a placeholder image.
-- `width` (optional): Set the width of the image.
-- `height` (optional): Set the height of the image.
-- `quality` (optional): Adjust the image quality (1-100).
-- `blur` (optional): Apply a blur effect with the given intensity.
-- `greyscale` (optional): Convert the image to greyscale.
-- `flip` (optional): Flip the image horizontally.
-- `rotate` (optional): Rotate the image by the given angle (in degrees).
-- `remove-bg` (optional): Remove the background from the image.
-- `watermark` (optional): Add a watermark with the given text.
+---
 
-## Example Requests
+### Example Requests
 
-1. **Fetch and Resize an Image**  
-   Resize the image to a width of 500px.
-   ```bash
-   /?image_url=https://example.com/image.png&width=500
+1. **Resize an image:**
+
+   URL:
+   ```
+   https://skypix.om-mishra.com?image_url=https://cdn.0m-mishra.com/logo.png&width=500
    ```
 
-2. **Apply a Blur Effect and Convert to Greyscale**  
-   Apply a blur effect with intensity 5 and convert the image to greyscale.
-   ```bash
-   /?image_url=https://example.com/image.png&blur=5&greyscale=true
+   Result (resized image):
+   ![Resized Image](https://skypix.om-mishra.com?image_url=https://cdn.0m-mishra.com/logo.png&width=500)
+
+2. **Apply a blur effect and greyscale:**
+
+   URL:
+   ```
+   https://skypix.om-mishra.com?image_url=https://cdn.0m-mishra.com/logo.png&blur=5&greyscale=true
    ```
 
-## Response Format
+   Result (blur and greyscale applied):
+   ![Blur and Greyscale](https://skypix.om-mishra.com?image_url=https://cdn.0m-mishra.com/logo.png&blur=5&greyscale=true)
 
-The API will return a modified image in the chosen format, directly in the response body.
+3. **Reduce image quality and rotate:**
 
-### Example Error Response:
+   URL:
+   ```
+   https://skypix.om-mishra.com?image_url=https://cdn.0m-mishra.com/logo.png&quality=10&rotate=90
+   ```
+
+   Result (quality reduced and rotated):
+   ![Quality Reduced and Rotated](https://skypix.om-mishra.com?image_url=https://cdn.0m-mishra.com/logo.png&quality=10&rotate=90)
+
+4. **Add a watermark:**
+
+   URL:
+   ```
+   https://skypix.om-mishra.com?image_url=https://cdn.0m-mishra.com/logo.png&watermark=SkyPix
+   ```
+
+   Result (watermark added):
+   ![Watermark](https://skypix.om-mishra.com?image_url=https://cdn.0m-mishra.com/logo.png&watermark=SkyPix)
+
+---
+
+### Response Format
+The API directly serves the modified image in the response body. Ensure your application can handle image responses.
+
+---
+
+### Error Handling
+If an error occurs, the API will return a JSON response with a status code and error message:
+
 ```json
 {
   "status": "error",
@@ -52,14 +84,18 @@ The API will return a modified image in the chosen format, directly in the respo
 }
 ```
 
-## Error Handling
+---
 
-If an error occurs, the API will return a `JSON` response with a status code and an error message.
+### Fair Use Policy
+SkyPix is provided free of charge for personal and non-commercial use. Please adhere to the following guidelines:
 
-- `404` – Resource not found.
-- `400` – Bad request (e.g., invalid parameters).
-- `500` – Internal server error.
+1. Do not process large batches of images.
+2. Do not use the service for commercial purposes.
+3. Ensure you have permission to process the images.
 
 ---
 
-For any issues or questions, please refer to the support documentation or contact us at support@om-mishra.com.
+### License
+**© 2024 SkyPix**
+
+All Rights Reserved | A service by Om Mishra
