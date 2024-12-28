@@ -42,7 +42,7 @@ class Image_Editor:
     def _quality(self, quality):
         """Apply quality compression to the image."""
         if quality is None:
-            return self
+            quality = 50
 
         quality = min(max(int(quality), 0), 100)
 
