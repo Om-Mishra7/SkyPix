@@ -31,41 +31,41 @@ This is the single endpoint for the API. All requests should be made to this URL
 
    URL:
    ```
-   https://skypix.om-mishra.com?image_url=https://cdn.0m-mishra.com/logo.png&width=500
+   https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&width=500
    ```
 
    Result (resized image):
-   ![Resized Image](https://skypix.om-mishra.com?image_url=https://cdn.0m-mishra.com/logo.png&width=500)
+   ![Resized Image](https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&width=500)
 
 2. **Apply a blur effect and greyscale:**
 
    URL:
    ```
-   https://skypix.om-mishra.com?image_url=https://cdn.0m-mishra.com/logo.png&blur=5&greyscale=true
+   https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&blur=5&greyscale=true
    ```
 
    Result (blur and greyscale applied):
-   ![Blur and Greyscale](https://skypix.om-mishra.com?image_url=https://cdn.0m-mishra.com/logo.png&blur=5&greyscale=true)
+   ![Blur and Greyscale](https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&blur=5&greyscale=true)
 
 3. **Reduce image quality and rotate:**
 
    URL:
    ```
-   https://skypix.om-mishra.com?image_url=https://cdn.0m-mishra.com/logo.png&quality=10&rotate=90
+   https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&quality=10&rotate=90
    ```
 
    Result (quality reduced and rotated):
-   ![Quality Reduced and Rotated](https://skypix.om-mishra.com?image_url=https://cdn.0m-mishra.com/logo.png&quality=10&rotate=90)
+   ![Quality Reduced and Rotated](https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&quality=10&rotate=90)
 
 4. **Add a watermark:**
 
    URL:
    ```
-   https://skypix.om-mishra.com?image_url=https://cdn.0m-mishra.com/logo.png&watermark=SkyPix
+   https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&watermark=SkyPix
    ```
 
    Result (watermark added):
-   ![Watermark](https://skypix.om-mishra.com?image_url=https://cdn.0m-mishra.com/logo.png&watermark=SkyPix)
+   ![Watermark](https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&watermark=SkyPix)
 
 ---
 
