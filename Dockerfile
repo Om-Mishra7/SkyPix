@@ -11,7 +11,8 @@ RUN apk add --no-cache \
     gcc \
     g++ \
     libffi-dev \
-    python3-dev
+    python3-dev \
+    gfortran  # Add gfortran for Fortran support
 
 # Copy the requirements.txt into the container
 COPY requirements.txt .
