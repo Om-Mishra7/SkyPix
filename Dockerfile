@@ -1,30 +1,25 @@
-# Use Python 3.9-alpine as the base image
 FROM python:3.9-alpine
 
-# Set the working directory in the container
-WORKDIR /app
-
-# Install build dependencies (compilers) required for installing Python packages with native extensions
-RUN apk add --no-cache \
-    build-base \
-    meson \
+# Install build dependencies for scipy
+RUN apk update && \
+    apk add --no-cache \
+    openblas-dev \
+    cmake \
     gcc \
-    g++ \
-    libffi-dev \
-    python3-dev \
-    gfortran  # Add gfortran for Fortran support
+    gfortran \
+    libatlas-dev \
+    make \
+    musl-dev
 
-# Copy the requirements.txt into the container
+# Install Python dependencies
 COPY requirements.txt .
-
-# Install the dependencies listed in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the entire project into the container
-COPY . .
+# Copy the project files into the container
+COPY . /app
 
-# Set the working directory for the backend app
-WORKDIR /app/backend
+# Set the working directory
+WORKDIR /app
 
-# Set the command to run the application using gunicorn
-CMD ["gunicorn", "--workers", "2", "--bind", "0.0.0.0:7001", "server:app"]
+# Run your application
+CMD ["python", "app.py"]
