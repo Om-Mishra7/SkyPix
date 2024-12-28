@@ -50,6 +50,10 @@ def docs():
 
 @app.route('/')
 def home():
+
+    if app_config['SERVE_REQUESTS'] == 'false':
+        return jsonify({'status': 'error', 'message': 'This service is currently disabled.'}), 503
+    
     # Fetch image URL from request
     image_url = request.args.get('image_url', 'https://cdn.om-mishra.com/logo.png')
 
@@ -84,11 +88,26 @@ def home():
                         image_editor._height(int(request.args.get('height')))
                     case 'quality':
                         image_editor._quality(int(request.args.get('quality')))
+                    case 'blur':
+                        image_editor._blur(int(request.args.get('blur')))
+                    case 'greyscale':
+                        image_editor._greyscale()
+                    case 'flip':
+                        image_editor._flip()
+                    case 'rotate':
+                        image_editor._rotate(int(request.args.get('rotate')))
+                    case 'remove-bg':
+                        image_editor._remove_bg()
+                    case 'watermark':
+                        image_editor._watermark(request.args.get('watermark'))
+                    case _:
+                        pass
+
             except Exception as error:
                 return jsonify({'status': 'error', 'message': 'Error applying modification: ' + str(error)}), 400
 
     # Get the modified image as a BytesIO object
-    serve_image = image_editor.get_image_bytes(format="PNG")
+    serve_image = image_editor.get_image_bytes()
 
     # Calculate the ETag for the image
     etag = image_editor.get_etag(format="PNG")
@@ -100,4 +119,4 @@ def home():
 # Run the app
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True if app_config['ENVIROMENT'] == 'development' else False)

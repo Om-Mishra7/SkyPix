@@ -1,3 +1,4 @@
+rembg[cpu]
 flask
 requests
 python-dotenv
