@@ -17,4 +17,4 @@ COPY . .
 WORKDIR /app/backend
 
 # Set the command to run the application using gunicorn
-CMD ["gunicorn", "--workers", "2", "--bind", "0.0.0.0:7001", "server:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:7001", "server:app"]
