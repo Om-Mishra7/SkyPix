@@ -35,7 +35,7 @@ This is the single endpoint for the API. All requests should be made to this URL
    ```
 
    Result (resized image):
-   ![Resized Image](https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&width=500)
+   ![Resized Imag](https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&width=500)
 
 2. **Apply a blur effect and greyscale:**
 
