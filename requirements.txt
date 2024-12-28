@@ -1,4 +1,5 @@
 rembg[cpu]
 flask
 requests
+gunicorn
 python-dotenv
