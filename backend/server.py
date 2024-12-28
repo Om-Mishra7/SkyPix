@@ -5,7 +5,7 @@ import requests
 from io import BytesIO
 from hashlib import sha1
 from dotenv import load_dotenv
-from flask import Flask, request, jsonify, render_template, send_file
+from flask import Flask, request, jsonify, render_template, send_file, redirect
 
 # Local imports 
 
@@ -47,6 +47,9 @@ def after_request(response):
 def docs():
     return render_template('docs.html')
 
+@app.route('favicon.ico')
+def favicon():
+    return redirect('https://cdn.om-mishra.com/favicon.ico', code=301)
 
 @app.route('/')
 def home():
