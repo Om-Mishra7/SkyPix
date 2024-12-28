@@ -7,11 +7,6 @@ from hashlib import sha1
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify, render_template, send_file, redirect
 
-# Local imports 
-
-from image_processing import Image_Editor
-
-
 # Load environment variables
 
 load_dotenv()
@@ -53,6 +48,8 @@ def favicon():
 
 @app.route('/')
 def home():
+
+    from image_processing import Image_Editor
 
     if app_config['SERVE_REQUESTS'] == 'false':
         return jsonify({'status': 'error', 'message': 'This service is currently disabled.'}), 503

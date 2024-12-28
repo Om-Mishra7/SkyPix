@@ -1,6 +1,8 @@
 # Use Python 3.10-slim as the base image
 FROM python:3.10-slim
 
+COPY u2net.onnx /home/.u2net/u2net.onnx
+
 # Set the working directory in the container
 WORKDIR /app
 
