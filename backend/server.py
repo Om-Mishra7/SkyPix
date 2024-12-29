@@ -1,6 +1,7 @@
 # Library imports
 
 import os
+import time
 import requests
 from io import BytesIO
 from dotenv import load_dotenv
@@ -52,6 +53,9 @@ app_config = {
     'ENVIROMENT': os.environ.get('ENVIROMENT'),
     'SERVE_REQUESTS': os.environ.get('SERVE_REQUESTS'),
     'ALLOWED_ORIGINS': os.environ.get('ALLOWED_ORIGINS'),
+    'NUMBER_OF_IMAGES_PROCESSED_THIS_SESSION': 0,
+    'SIZE_OF_IMAGE_PROCESSED_THIS_SESSION': 0,
+    'AVERAGE_RESPONSE_TIME_THIS_SESSION': 0
 }
 
 allowed_image_modification_parameters = ['width', 'height', 'quality', 'format', 'blur', 'greyscale', 'flip', 'rotate', 'watermark', 'remove-bg']
@@ -79,7 +83,7 @@ def after_request(response):
 
 @app.route('/docs')
 def docs():
-    return render_template('docs.html')
+    return render_template('docs.html', NUMBER_OF_IMAGES_PROCESSED_THIS_SESSION=app_config['NUMBER_OF_IMAGES_PROCESSED_THIS_SESSION'], SIZE_OF_IMAGE_PROCESSED_THIS_SESSION=app_config['SIZE_OF_IMAGE_PROCESSED_THIS_SESSION'], AVERAGE_RESPONSE_TIME_THIS_SESSION=app_config['AVERAGE_RESPONSE_TIME_THIS_SESSION'])
 
 @app.route('/favicon.ico')
 def favicon():
@@ -90,6 +94,11 @@ def home():
     global image
     global is_cached
     from image_processing import Image_Editor
+
+    app_config['NUMBER_OF_IMAGES_PROCESSED_THIS_SESSION'] += 1
+
+    # Request start time 
+    request_start_time = time.time()
 
     if app_config['SERVE_REQUESTS'] == 'false':
         return jsonify({'status': 'error', 'message': 'This service is currently disabled.'}), 503
@@ -182,6 +191,16 @@ def home():
 
     if request.headers.get('If-None-Match') == etag:
         return '', 304
+    
+    # Find image size
+    image_size = len(serve_image.getvalue())
+
+    # Calculate the response time
+    response_time = round(time.time() - request_start_time, 3)  # Rounded to 3 decimal places
+
+    # Update the session statistics
+    app_config['SIZE_OF_IMAGE_PROCESSED_THIS_SESSION'] += image_size / 1024
+    app_config['AVERAGE_RESPONSE_TIME_THIS_SESSION'] = (app_config['AVERAGE_RESPONSE_TIME_THIS_SESSION'] + response_time) / 2
 
     # Serve the image
     return send_file(serve_image, mimetype='image/webp', as_attachment=False, etag=etag, max_age=18000)
