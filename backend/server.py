@@ -201,7 +201,7 @@ def home():
     response_time = round(time.time() - request_start_time, 3)  # Rounded to 3 decimal places
 
     # Update the session statistics
-    app_config['SIZE_OF_IMAGE_PROCESSED_THIS_SESSION'] += round(image_size / 1024, 2)  # Convert to KB
+    app_config['SIZE_OF_IMAGE_PROCESSED_THIS_SESSION'] += round((image_size / 1024), 2)  # Convert to KB
     app_config['AVERAGE_RESPONSE_TIME_THIS_SESSION'] = round((app_config['AVERAGE_RESPONSE_TIME_THIS_SESSION'] + response_time) / app_config['NUMBER_OF_IMAGES_PROCESSED_THIS_SESSION'], 3)
 
     # Serve the image
