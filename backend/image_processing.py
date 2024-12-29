@@ -1,12 +1,19 @@
 from PIL import Image, ImageFilter, ImageOps, ImageDraw, ImageFont
 from io import BytesIO
 from hashlib import sha1
+import warnings
+warnings.simplefilter("error", Image.DecompressionBombWarning)
+
 
 class Image_Editor:
     def __init__(self, image, image_url):
         # Load the image once and prepare it in the optimal mode
-        self.image = Image.open(image)
 
+        try:
+            self.image = Image.open(image)
+        except Exception as error:
+            self.image = None
+            return
         try:
             if self.image.mode in ("RGBA", "LA") or (self.image.mode == "P" and "transparency" in self.image.info):
                 self.image = self.image.convert("RGBA")  # Ensure image has RGBA support
@@ -127,11 +134,16 @@ class Image_Editor:
 
         # Create a BytesIO object to save the image in memory
         img_byte_arr = BytesIO()
-        self.image.save(img_byte_arr, format=format)
+        try:
+            self.image.save(img_byte_arr, format=format)
+        except Exception as error:
+            # Fallback to PNG format if the specified format is not supported
+            format = "PNG"
+            self.image.save(img_byte_arr, format="PNG")
         img_byte_arr.seek(0)  # Reset the pointer to the beginning of the BytesIO object
-        return img_byte_arr
+        return img_byte_arr, format
 
     def get_etag(self, format="WEBP"):
         """Returns the ETag for the image."""
-        img_byte_arr = self.get_image_bytes(format)
+        img_byte_arr, image_format = self.get_image_bytes(format)
         return sha1(img_byte_arr.getvalue()).hexdigest()

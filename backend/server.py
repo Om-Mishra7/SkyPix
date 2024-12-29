@@ -122,7 +122,6 @@ def home():
             break
 
     if image is None:  # If the image is not found in the cache, fetch it
-        print('Image not found in cache, fetching from origin...')
         is_cached = False
         try:
             image_request_response = requests.get(
@@ -149,12 +148,15 @@ def home():
 
         except Exception as error:
             return jsonify({'status': 'error', 'message': 'The requested image could not be fetched, from upstream origin due to ' + str(error)}), 400
+    
+    if len(request.args) == 1 and 'image_url' in request.args:
+        return send_file(image, mimetype='image/png', as_attachment=False, max_age=31536000)
 
     # Create Image_Editor object
     image_editor = Image_Editor(image, image_url)
 
     if image_editor.image is None:
-        return jsonify({'status': 'error', 'message': 'The requested image was not in a supported format.'}), 400
+        return jsonify({'status': 'error', 'message': 'The requested image was not in a supported format or is too large to process.'}), 400    
 
     # Apply image modifications based on request arguments
     for parameter in request.args:
@@ -184,10 +186,10 @@ def home():
                 return jsonify({'status': 'error', 'message': 'Error applying modification: ' + str(error)}), 400
 
     # Get the modified image as a BytesIO object
-    serve_image = image_editor.get_image_bytes()
+    serve_image, image_type = image_editor.get_image_bytes()
 
     # Calculate the ETag for the image
-    etag = image_editor.get_etag()
+    etag = image_editor.get_etag(image_type)
 
     if request.headers.get('If-None-Match') == etag:
         return '', 304
@@ -198,15 +200,12 @@ def home():
     # Calculate the response time
     response_time = round(time.time() - request_start_time, 3)  # Rounded to 3 decimal places
 
-
-    print(f"Image processed in {response_time} seconds, size: {image_size} bytes")
-
     # Update the session statistics
     app_config['SIZE_OF_IMAGE_PROCESSED_THIS_SESSION'] += round(image_size / 1024, 2)  # Convert to KB
     app_config['AVERAGE_RESPONSE_TIME_THIS_SESSION'] = round((app_config['AVERAGE_RESPONSE_TIME_THIS_SESSION'] + response_time) / app_config['NUMBER_OF_IMAGES_PROCESSED_THIS_SESSION'], 3)
 
     # Serve the image
-    return send_file(serve_image, mimetype='image/webp', as_attachment=False, etag=etag, max_age=18000)
+    return send_file(serve_image, mimetype=f'image/{image_type}', as_attachment=False, max_age=31536000, etag=etag)
 
 
 # Error handlers
