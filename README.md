@@ -33,31 +33,31 @@ This is the single endpoint for the API. All requests should be made to this URL
    ```
    https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&width=50&height=50
    ```
-   ![Resized Imag](https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&width=50&height=50)
+   ![Resized Imag](https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&width=100&height=100)
 
 2. **Apply a blur effect and greyscale:**
 
    URL:
    ```
-   https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&blur=5&greyscale=true
+   https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&blur=5&greyscale=true&width=100&height=100
    ```
-   ![Blur and Greyscale](https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&blur=5&greyscale=true)
+   ![Blur and Greyscale](https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&blur=5&greyscale=true&width=100&height=100)
 
 3. **Reduce image quality and rotate:**
 
    URL:
    ```
-   https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&quality=10&rotate=90
+   https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&quality=10&rotate=90&width=100&height=100
    ```
-   ![Quality Reduced and Rotated](https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&quality=10&rotate=90)
+   ![Quality Reduced and Rotated](https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&quality=10&rotate=90&width=100&height=100)
 
 4. **Add a watermark:**
 
    URL:
    ```
-   https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&watermark=SkyPix
+   https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&watermark=SkyPix&width=100&height=100
    ```
-   ![Watermark](https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&watermark=SkyPix)
+   ![Watermark](https://skypix.om-mishra.com?image_url=https://cdn.om-mishra.com/logo.png&watermark=SkyPix&width=100&height=100)
 
 ---
 
