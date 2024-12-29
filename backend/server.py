@@ -198,9 +198,12 @@ def home():
     # Calculate the response time
     response_time = round(time.time() - request_start_time, 3)  # Rounded to 3 decimal places
 
+
+    print(f"Image processed in {response_time} seconds, size: {image_size} bytes")
+
     # Update the session statistics
     app_config['SIZE_OF_IMAGE_PROCESSED_THIS_SESSION'] += round(image_size / 1024, 2)  # Convert to KB
-    app_config['AVERAGE_RESPONSE_TIME_THIS_SESSION'] = (app_config['AVERAGE_RESPONSE_TIME_THIS_SESSION'] + response_time) / 2
+    app_config['AVERAGE_RESPONSE_TIME_THIS_SESSION'] = round((app_config['AVERAGE_RESPONSE_TIME_THIS_SESSION'] + response_time) / app_config['NUMBER_OF_IMAGES_PROCESSED_THIS_SESSION'], 3)
 
     # Serve the image
     return send_file(serve_image, mimetype='image/webp', as_attachment=False, etag=etag, max_age=18000)
